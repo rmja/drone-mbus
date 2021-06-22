@@ -3,16 +3,14 @@ use core::convert::TryInto;
 use alloc::vec::Vec;
 use crc::{Crc, CRC_16_EN_13757};
 
-use crate::{
-    ffa::FrameFormatA, ffb::FrameFormatB, frameformat::FrameFormat, mbusaddress::MBusAddress,
-};
+use crate::{bcd::BcdNumber, ffa::FrameFormatA, ffb::FrameFormatB, frameformat::FrameFormat, mbusaddress::MBusAddress};
 
 const CRC: Crc<u16> = Crc::<u16>::new(&CRC_16_EN_13757);
 
 pub struct WMBusPacket {
-    pub link_layer: LinkLayer,
-    pub ext_link_layer: Option<ExtendedLinkLayer>,
     pub application_layer: ApplicationLayer,
+    pub ext_link_layer: Option<ExtendedLinkLayer>,
+    pub link_layer: LinkLayer,
 }
 
 pub struct LinkLayer {
@@ -92,15 +90,35 @@ pub struct ApplicationLayer {
 }
 
 impl WMBusPacket {
-    pub fn parse_ffa(frame_bytes: &[u8]) -> Result<WMBusPacket, ()> {
+    pub fn new() -> Self {
+        Self {
+            application_layer: ApplicationLayer {
+                ci: 0x00,
+                data: vec![],
+            },
+            ext_link_layer: None,
+            link_layer: LinkLayer {
+                length: None,
+                control: 0x12,
+                address: MBusAddress {
+                    manufacturer_code: 0,
+                    serial_number: BcdNumber::new_u32(0).unwrap(),
+                    version: 0,
+                    device_type: 0,
+                }
+            }
+        }
+    }
+
+    pub fn parse_ffa(frame_bytes: &[u8]) -> Result<Self, ()> {
         Self::parse(FrameFormatA, frame_bytes)
     }
 
-    pub fn parse_ffb(frame_bytes: &[u8]) -> Result<WMBusPacket, ()> {
+    pub fn parse_ffb(frame_bytes: &[u8]) -> Result<Self, ()> {
         Self::parse(FrameFormatB, frame_bytes)
     }
 
-    fn parse<FF: FrameFormat>(_frame_format: FF, frame_bytes: &[u8]) -> Result<WMBusPacket, ()> {
+    fn parse<FF: FrameFormat>(_frame_format: FF, frame_bytes: &[u8]) -> Result<Self, ()> {
         // Verify CRC
         let blocks = FF::frame_block_iter(frame_bytes);
         let mut payload = Vec::with_capacity(frame_bytes.len());
@@ -147,10 +165,10 @@ impl WMBusPacket {
             data: rest[1..].to_vec(),
         };
 
-        Ok(WMBusPacket {
-            link_layer: ll,
-            ext_link_layer: ell,
+        Ok(Self {
             application_layer: apl,
+            ext_link_layer: ell,
+            link_layer: ll,
         })
     }
 }
