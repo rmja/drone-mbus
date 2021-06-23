@@ -1,5 +1,13 @@
-#[derive(Clone, Copy, PartialEq)]
-pub struct BcdNumber<T>(T);
+use core::fmt::{Display, LowerHex};
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BcdNumber<T: LowerHex>(T);
+
+impl<T: LowerHex> Display for BcdNumber<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{:#x}", self.0)
+    }
+}
 
 macro_rules! impl_bcd {
     ($type:ty; $new:ident; $encode:ident; $bcd_max:expr, $mask:expr) => {

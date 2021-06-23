@@ -138,7 +138,7 @@ pub mod tests {
         let mut iter = FrameFormatB::frame_block_iter(&[
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
             11, 0, 0,
-        ]);
+        ]).unwrap();
         assert_eq!(Some([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,].as_ref()), iter.next());
         assert_eq!(Some([11, 0, 0,].as_ref()), iter.next());
         assert_eq!(None, iter.next());

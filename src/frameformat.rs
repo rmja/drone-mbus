@@ -13,15 +13,15 @@ pub trait FrameFormat: Sized {
     }
     fn block_count_from_payload_size(payload_size: usize) -> Result<usize, ()>;
     fn block_count_from_frame_size(frame_size: usize) -> Result<usize, ()>;
-    fn frame_block_iter<'a>(frame_bytes: &'a[u8]) -> FrameBlockIterator<'a, Self> {
-        let block_count = Self::block_count_from_frame_size(frame_bytes.len()).unwrap();
-        FrameBlockIterator {
+    fn frame_block_iter<'a>(frame_bytes: &'a[u8]) -> Result<FrameBlockIterator<'a, Self>, ()> {
+        let block_count = Self::block_count_from_frame_size(frame_bytes.len())?;
+        Ok(FrameBlockIterator {
             frame_bytes,
             block_count,
             block_index: 0,
             offset: 0,
             frame_format: PhantomData,
-        }
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-use core::convert::TryInto;
+use core::{convert::TryInto, fmt::Display};
 
 use crate::bcd::{self, BcdNumber};
 
@@ -45,6 +45,12 @@ type Identifier = [u8; 8];
 enum FieldLayout {
     Default, // The default layout according to EN13757, i.e. Manufacturer, serial number, version, type
     Diehl, // The layout used by Diehl on some of its meters, i.e. Manufacturer, version, type, serial number
+}
+
+impl Display for MBusAddress {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{:#x}:{:?}/{:?}/{:?}", self.manufacturer_code, self.serial_number, self.version, self.device_type)
+    }
 }
 
 impl MBusAddress {

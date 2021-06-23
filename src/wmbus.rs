@@ -90,7 +90,7 @@ pub struct ApplicationLayer {
 }
 
 impl WMBusPacket {
-    pub fn new() -> Self {
+    pub fn request() -> Self {
         Self {
             application_layer: ApplicationLayer {
                 ci: 0x00,
@@ -99,7 +99,7 @@ impl WMBusPacket {
             ext_link_layer: None,
             link_layer: LinkLayer {
                 length: None,
-                control: 0x12,
+                control: 0x44,
                 address: MBusAddress {
                     manufacturer_code: 0,
                     serial_number: BcdNumber::new_u32(0).unwrap(),
@@ -120,10 +120,9 @@ impl WMBusPacket {
 
     fn parse<FF: FrameFormat>(_frame_format: FF, frame_bytes: &[u8]) -> Result<Self, ()> {
         // Verify CRC
-        let blocks = FF::frame_block_iter(frame_bytes);
         let mut payload = Vec::with_capacity(frame_bytes.len());
         let mut digest = CRC.digest();
-        for (index, block) in blocks.enumerate() {
+        for (index, block) in FF::frame_block_iter(frame_bytes)?.enumerate() {
             if FF::block_has_crc(index) {
                 let block_payload = &block[..block.len() - 2];
                 payload.extend_from_slice(block_payload);
