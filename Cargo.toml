@@ -2,8 +2,7 @@
 name = "drone-mbus"
 version = "0.1.0"
 authors = ["Rasmus Melchior Jacobsen <rmja@laesoe.org>"]
-edition = "2018"
-resolver = "2"
+edition = "2021"
 repository = "https://github.com/rmja/drone-mbus"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
@@ -15,7 +14,7 @@ Wireless M-Bus protocol implementation for Drone OS.
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-bitvec = { version = "0.21", default-features = false, features = ["alloc"] }
+bitvec = { version = "1", default-features = false, features = ["alloc"] }
 crc = "2.0"
 num-derive = "0.3"
 num-traits = { version = "0.2", default-features = false }

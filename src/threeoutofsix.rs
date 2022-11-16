@@ -13,7 +13,7 @@ const DECODE_TABLE: [i8; 0x40] = [
 ];
 
 impl ThreeOutOfSix {
-    pub fn encode(data: &[u8]) -> BitVec<Msb0, u8> {
+    pub fn encode(data: &[u8]) -> BitVec<u8, Msb0> {
         #[derive(PartialEq)]
         enum State { A, B, C, D, }
 
@@ -69,7 +69,7 @@ impl ThreeOutOfSix {
         result
     }
 
-    pub fn decode(encoded: &BitVec<Msb0, u8>) -> Result<Vec<u8>, ()> {
+    pub fn decode(encoded: &BitVec<u8, Msb0>) -> Result<Vec<u8>, ()> {
         let data_len = encoded.len() / 12; // / 6 / 2
         if encoded.len() != data_len * 12 {
             // Must decode a multiple of bytes
@@ -127,7 +127,7 @@ pub mod tests {
             0x59, 0x65, 0x96, 0x59, 0x65, 0x96, 0x59, 0x65,
             0x96, 0xa6, 0x9a, 0x69,
         ];
-        let expected: BitVec<Msb0, u8> = BitVec::from_vec(encoded_expected);
+        let expected: BitVec<u8, Msb0> = BitVec::from_vec(encoded_expected);
 
         assert_eq!(expected, encoded);
     }
